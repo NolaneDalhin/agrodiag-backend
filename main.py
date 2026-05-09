@@ -1,8 +1,12 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 import httpx
 import base64
 import re
+import os
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -13,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GROQ_API_KEY = "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"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 @app.post("/analyser")
 async def analyser_plante(image: UploadFile = File(...)):

@@ -28,17 +28,19 @@ async def analyser_plante(image: UploadFile = File(...)):
 
         payload = {
             "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+            "temperature": 0,
+            "max_tokens": 200,
             "messages": [{
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": """Tu es un expert en maladies des plantes qui parle a des agriculteurs simples.
-Reponds STRICTEMENT ainsi sans markdown et sans termes scientifiques:
+                        "text": """Tu es un expert en phytopathologie. Analyse cette image de feuille ou plante.
+Réponds UNIQUEMENT dans ce format exact, sans rien d'autre :
 MALADIE: [nom simple de la maladie ou Plante saine]
-CONFIANCE: [pourcentage, exemple: 90%]
-TRAITEMENT: [conseil simple en 1 phrase, avec des produits faciles a trouver]
-AGENT: [OUI si la maladie est grave et necessite un specialiste, NON sinon]"""
+CONFIANCE: [pourcentage, exemple: 85%]
+TRAITEMENT: [1 phrase simple avec produits faciles a trouver]
+AGENT: [OUI si maladie grave, NON sinon]"""
                     },
                     {
                         "type": "image_url",
@@ -47,8 +49,7 @@ AGENT: [OUI si la maladie est grave et necessite un specialiste, NON sinon]"""
                         }
                     }
                 ]
-            }],
-            "max_tokens": 200
+            }]
         }
 
         async with httpx.AsyncClient() as client:

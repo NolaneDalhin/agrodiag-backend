@@ -98,7 +98,7 @@ async def chat_agricole(body: MessageChat):
         payload = {
             "model": "meta-llama/llama-4-scout-17b-16e-instruct",
             "temperature": 0.7,
-            "max_tokens": 300,
+            "max_tokens": 1000,
             "messages": [
                 {
                     "role": "system",

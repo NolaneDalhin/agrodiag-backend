@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from dotenv import load_dotenv
 import httpx
 import base64
@@ -18,6 +19,9 @@ app.add_middleware(
 )
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+
+class MessageChat(BaseModel):
+    message: str
 
 @app.post("/analyser")
 async def analyser_plante(image: UploadFile = File(...)):
@@ -86,6 +90,46 @@ AGENT: [OUI si maladie grave, NON sinon]"""
     except Exception as e:
         print(f"ERREUR: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/chat")
+async def chat_agricole(body: MessageChat):
+    try:
+        payload = {
+            "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+            "temperature": 0.7,
+            "max_tokens": 300,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "Tu es un assistant agricole expert. Tu aides les agriculteurs avec leurs questions sur les plantes, maladies, traitements et cultures. Réponds de façon simple et claire, sans termes trop scientifiques."
+                },
+                {
+                    "role": "user",
+                    "content": body.message
+                }
+            ]
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json=payload,
+                timeout=60
+            )
+            result = response.json()
+
+        reponse = result["choices"][0]["message"]["content"]
+        return {"reponse": reponse}
+
+    except Exception as e:
+        print(f"ERREUR CHAT: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/")
 def root():

@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.post("/analyser")
 async def analyser_plante(image: UploadFile = File(...)):
@@ -59,7 +59,7 @@ AGENT: [OUI si la maladie est grave et necessite un specialiste, NON sinon]"""
                     "Content-Type": "application/json"
                 },
                 json=payload,
-                timeout=30
+                timeout=60
             )
             result = response.json()
 

@@ -39,8 +39,15 @@ async def analyser_plante(image: UploadFile = File(...)):
                 "content": [
                     {
                         "type": "text",
-                        "text": """Tu es un expert en phytopathologie. Analyse cette image de feuille ou plante.
-Réponds UNIQUEMENT dans ce format exact, sans rien d'autre :
+                        "text": """Tu es un expert en phytopathologie. Analyse cette image.
+
+Si l'image ne montre PAS une plante ou une feuille, réponds UNIQUEMENT :
+MALADIE: Image invalide
+CONFIANCE: 0%
+TRAITEMENT: Veuillez prendre une photo d'une plante ou d'une feuille.
+AGENT: NON
+
+Si c'est bien une plante, réponds UNIQUEMENT dans ce format exact :
 MALADIE: [nom simple de la maladie ou Plante saine]
 CONFIANCE: [pourcentage, exemple: 85%]
 TRAITEMENT: [1 phrase simple avec produits faciles a trouver]
@@ -98,7 +105,7 @@ async def chat_agricole(body: MessageChat):
         payload = {
             "model": "meta-llama/llama-4-scout-17b-16e-instruct",
             "temperature": 0.7,
-            "max_tokens": 1000,
+            "max_tokens": 4096,
             "messages": [
                 {
                     "role": "system",
